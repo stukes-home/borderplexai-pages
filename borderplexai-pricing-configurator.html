@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Package — BorderPlex AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-alt: #f7f8fb;
+    --surface: #ffffff;
+    --border: #e2e5ee;
+    --border-hover: #c8cdd8;
+    --text: #1a1d26;
+    --text-secondary: #4b5066;
+    --text-muted: #8891a5;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-light: #eff4ff;
+    --accent-lighter: #f5f8ff;
+    --green: #059669;
+    --green-light: #ecfdf5;
+    --green-border: #a7f3d0;
+    --gold: #d97706;
+    --gold-light: #fffbeb;
+    --gold-border: #fde68a;
+    --red: #dc2626;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg-alt); color: var(--text); font-family: var(--font); line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 960px; margin: 0 auto; padding: 32px 20px 140px; }
+  .header { text-align: center; margin-bottom: 32px; animation: fadeIn 0.5s ease; }
+  .header-brand { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .header-brand img { height: 32px; width: auto; }
+  .header h1 { font-size: clamp(26px, 4.5vw, 38px); font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 8px; }
+  .header p { font-size: 15px; color: var(--text-secondary); max-width: 500px; margin: 0 auto; }
+  .steps { display: flex; justify-content: center; gap: 6px; margin-bottom: 28px; animation: fadeIn 0.5s ease 0.05s both; }
+  .step-pill { font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); transition: all 0.25s ease; }
+  .step-pill.active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .step-pill.done { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .section { margin-bottom: 28px; }
+  .section-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; }
+  .bundle-quick-picks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .bundle-quick-picks { grid-template-columns: 1fr; } }
+  .bundle-pick { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 20px 16px; cursor: pointer; transition: all 0.2s ease; text-align: center; box-shadow: var(--shadow-sm); position: relative; }
+  .bundle-pick:hover { border-color: var(--border-hover); box-shadow: var(--shadow); }
+  .bundle-pick.active { border-color: var(--accent); background: var(--accent-lighter); box-shadow: 0 0 0 3px var(--accent-light); }
+  .bundle-pick .bp-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 10px; background: var(--accent); color: white; white-space: nowrap; display: none; }
+  .bundle-pick.popular .bp-badge { display: block; }
+  .bundle-pick .bp-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .bundle-pick .bp-price { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+  .bundle-pick .bp-price strong { font-size: 22px; font-weight: 800; color: var(--text); }
+  .bundle-pick .bp-monthly { font-size: 13px; color: var(--text-muted); }
+  .bundle-pick .bp-save { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--green); background: var(--green-light); border: 1px solid var(--green-border); padding: 2px 10px; border-radius: 10px; }
+  .or-divider { text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600; margin: 20px 0 24px; display: flex; align-items: center; gap: 16px; }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .card-grid { display: grid; gap: 10px; }
+  .card-grid.foundations { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 18px 20px; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm); user-select: none; }
+  .card:hover { border-color: var(--border-hover); box-shadow: var(--shadow); }
+  .card.selected { border-color: var(--accent); background: var(--accent-lighter); box-shadow: 0 0 0 3px var(--accent-light); }
+  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .card-name { font-weight: 700; font-size: 15px; color: var(--text); }
+  .card-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s ease; background: var(--bg); }
+  .card.selected .card-check { border-color: var(--accent); background: var(--accent); }
+  .card.selected .card-check::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; }
+  .card-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .card-pricing { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .price-tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 6px; }
+  .price-tag.setup { color: var(--accent); background: var(--accent-light); }
+  .price-tag.monthly { color: var(--green); background: var(--green-light); }
+  .price-tag.one-time-only { color: var(--purple); background: var(--purple-light); }
+  .addon-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .addon-left { flex: 1; min-width: 0; }
+  .addon-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .qty-control { display: flex; align-items: center; background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .qty-btn { width: 32px; height: 32px; border: none; background: transparent; color: var(--text-secondary); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
+  .qty-btn:hover { background: var(--accent-light); color: var(--accent); }
+  .qty-val { font-size: 14px; font-weight: 600; width: 32px; text-align: center; color: var(--text); }
+  .subsection { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin: 20px 0 8px; padding-left: 2px; }
+  .subsection:first-child { margin-top: 0; }
+  .bilingual-note { font-size: 12px; color: var(--purple); font-style: italic; margin-top: 2px; }
+  .bundle-banner { display: none; background: var(--gold-light); border: 2px solid var(--gold-border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 24px; animation: slideDown 0.35s ease both; }
+  .bundle-banner.visible { display: block; }
+  .bundle-banner .banner-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 4px; }
+  .bundle-banner h3 { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .bundle-banner .savings { font-size: 14px; font-weight: 600; color: var(--green); margin-bottom: 2px; }
+  .bundle-banner .savings .strikethrough { color: var(--red); text-decoration: line-through; opacity: 0.7; margin-right: 4px; }
+  .bundle-banner .bundle-desc { font-size: 13px; color: var(--text-secondary); }
+  .summary-panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; padding: 0 20px 16px; pointer-events: none; }
+  .summary-panel::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 120px; background: linear-gradient(to top, var(--bg-alt) 60%, transparent); pointer-events: none; }
+  .summary-inner { position: relative; max-width: 960px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: var(--shadow-lg); pointer-events: all; }
+  .summary-prices { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .summary-price-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 1px; }
+  .summary-price-value { font-size: 24px; font-weight: 800; line-height: 1.2; }
+  .summary-price-value.setup { color: var(--accent); }
+  .summary-price-value.monthly { color: var(--green); }
+  .summary-price-value .original { font-size: 14px; font-weight: 600; color: var(--red); text-decoration: line-through; margin-right: 4px; opacity: 0.7; }
+  .summary-save { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: var(--green-light); border: 1px solid var(--green-border); color: var(--green); white-space: nowrap; }
+  .summary-right { display: flex; align-items: center; gap: 12px; }
+  .item-count { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+  .checkout-btn { padding: 12px 28px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: white; font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+  .checkout-btn:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+  .checkout-btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+  @media (max-width: 640px) {
+    .summary-inner { flex-direction: column; text-align: center; }
+    .summary-prices { justify-content: center; }
+    .summary-right { flex-direction: column; width: 100%; }
+    .checkout-btn { width: 100%; }
+    .addon-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .addon-right { align-self: flex-start; }
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-brand">
+      <img src="https://cdn.durable.co/logos/2ck4p6PoRU91JUVfWYV8XgqWvmge5DLikIxBuhjnd8sEDIZXXtf6uWfWe7RytOCi.png" alt="BorderPlex AI" onerror="this.style.display='none'">
+    </div>
+    <h1>Build Your Package</h1>
+    <p>Pick a foundation, add what you need, and see your price update in real time. Bundle discounts apply automatically.</p>
+  </div>
+  <div class="steps">
+    <div class="step-pill active" id="step1">1. Foundation</div>
+    <div class="step-pill" id="step2">2. Add-Ons</div>
+    <div class="step-pill" id="step3">3. Checkout</div>
+  </div>
+  <div class="section">
+    <div class="section-label">Quick Start — Pick a Bundle</div>
+    <div class="bundle-quick-picks">
+      <div class="bundle-pick" onclick="applyBundle('starter')" id="bp-starter">
+        <div class="bp-name">Starter</div>
+        <div class="bp-price"><strong>$849</strong> setup</div>
+        <div class="bp-monthly">+ $84/month</div>
+        <div class="bp-save">Save $200 on setup</div>
+      </div>
+      <div class="bundle-pick popular" onclick="applyBundle('growth')" id="bp-growth">
+        <div class="bp-badge">Most Popular</div>
+        <div class="bp-name">Growth</div>
+        <div class="bp-price"><strong>$1,199</strong> setup</div>
+        <div class="bp-monthly">+ $144/month</div>
+        <div class="bp-save">Save $250 on setup</div>
+      </div>
+      <div class="bundle-pick" onclick="applyBundle('dominate')" id="bp-dominate">
+        <div class="bp-name">Dominate</div>
+        <div class="bp-price"><strong>$1,599</strong> setup</div>
+        <div class="bp-monthly">+ $209/month</div>
+        <div class="bp-save">Save $200 on setup</div>
+      </div>
+    </div>
+  </div>
+  <div class="or-divider">or build your own</div>
+  <div class="section">
+    <div class="section-label">Foundation — Pick One</div>
+    <div class="card-grid foundations">
+      <div class="card" onclick="selectFoundation('basic')" id="card-basic">
+        <div class="card-top"><div class="card-name">Basic Website</div><div class="card-check"></div></div>
+        <div class="card-desc">Professional 1-page site, mobile-friendly, contact form, click-to-call, Google Maps, social links, basic SEO, hosting and SSL included.</div>
+        <div class="card-pricing"><span class="price-tag setup">$599 setup</span><span class="price-tag monthly">$49/mo</span></div>
+      </div>
+      <div class="card" onclick="selectFoundation('ai')" id="card-ai">
+        <div class="card-top"><div class="card-name">AI-Powered Website</div><div class="card-check"></div></div>
+        <div class="card-desc">Everything in Basic + multilingual AI chatbot trained on your business, answers FAQs 24/7, captures leads automatically.</div>
+        <div class="card-pricing"><span class="price-tag setup">$799 setup</span><span class="price-tag monthly">$89/mo</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-label">Bilingual</div>
+    <div class="card-grid">
+      <div class="card" onclick="toggleAddon('bilingual')" id="card-bilingual">
+        <div class="addon-row">
+          <div class="addon-left">
+            <div class="card-top"><div class="card-name">Bilingual Site Content</div><div class="card-check"></div></div>
+            <div class="card-desc">Full English/Spanish content with culturally adapted CTAs — not just direct translation.</div>
+            <div class="bilingual-note">AI chatbot is already multilingual — this covers your website content.</div>
+          </div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$150 setup</span><span class="price-tag monthly">$20/mo</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bundle-banner" id="bundleBanner">
+    <div class="banner-badge">Bundle Match Detected</div>
+    <h3 id="bundleName"></h3>
+    <div class="savings" id="bundleSavings"></div>
+    <div class="bundle-desc" id="bundleDesc"></div>
+  </div>
+  <div class="section">
+    <div class="section-label">Add-On Modules</div>
+    <div class="subsection">Pages</div>
+    <div class="card-grid">
+      <div class="card" onclick="toggleAddon('pages')" id="card-pages">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Additional Pages</div><div class="card-check"></div></div><div class="card-desc">About, Services, Gallery, Team, FAQ, etc.</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$100/page</span><span class="price-tag one-time-only">one-time</span></div><div class="qty-control" onclick="event.stopPropagation()"><button class="qty-btn" onclick="adjustQty('pages',-1)">-</button><span class="qty-val" id="qty-pages">0</span><button class="qty-btn" onclick="adjustQty('pages',1)">+</button></div></div>
+        </div>
+      </div>
+      <div class="card" onclick="toggleAddon('blog')" id="card-blog">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Blog Setup</div><div class="card-check"></div></div><div class="card-desc">Blog section with 2 starter posts.</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$200 setup</span><span class="price-tag one-time-only">one-time</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="subsection">Local and Visibility</div>
+    <div class="card-grid">
+      <div class="card" onclick="toggleAddon('googleVis')" id="card-googleVis">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Google Visibility Package</div><div class="card-check"></div></div><div class="card-desc">Google Business Profile setup + keyword optimization + Search Console + monthly report.</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$250 setup</span><span class="price-tag monthly">$35/mo</span></div></div>
+        </div>
+      </div>
+      <div class="card" onclick="toggleAddon('gbpOnly')" id="card-gbpOnly">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Google Business Profile Only</div><div class="card-check"></div></div><div class="card-desc">Just the Google listing setup/optimization.</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$150 setup</span><span class="price-tag one-time-only">one-time</span></div></div>
+        </div>
+      </div>
+      <div class="card" onclick="toggleAddon('reviewBooster')" id="card-reviewBooster">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Review Booster</div><div class="card-check"></div></div><div class="card-desc">Review request automation + live Google Reviews widget + monthly summary.</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$100 setup</span><span class="price-tag monthly">$20/mo</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="subsection">Customer Communication</div>
+    <div class="card-grid">
+      <div class="card" onclick="toggleAddon('booking')" id="card-booking">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Online Booking System</div><div class="card-check"></div></div><div class="card-desc">Let customers book appointments directly from your site.</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$150 setup</span><span class="price-tag monthly">$15/mo</span></div></div>
+        </div>
+      </div>
+      <div class="card" onclick="toggleAddon('contactForm')" id="card-contactForm">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Contact Form Pro</div><div class="card-check"></div></div><div class="card-desc">Custom form with service selection, file uploads, or quote requests.</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$75 setup</span><span class="price-tag one-time-only">one-time</span></div></div>
+        </div>
+      </div>
+      <div class="card" onclick="toggleAddon('email')" id="card-email">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Custom Domain Email</div><div class="card-check"></div></div><div class="card-desc">Professional email (you@yourbusiness.com).</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag setup">$50 setup</span><span class="price-tag monthly">$10/mo</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="subsection">Support and Maintenance</div>
+    <div class="card-grid">
+      <div class="card" onclick="toggleAddon('content2')" id="card-content2">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Content Updates (2/mo)</div><div class="card-check"></div></div><div class="card-desc">Up to 2 content changes per month (text, images, minor tweaks).</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag monthly">$25/mo</span></div></div>
+        </div>
+      </div>
+      <div class="card" onclick="toggleAddon('content5')" id="card-content5">
+        <div class="addon-row">
+          <div class="addon-left"><div class="card-top"><div class="card-name">Content Updates (5/mo)</div><div class="card-check"></div></div><div class="card-desc">Up to 5 content changes per month.</div></div>
+          <div class="addon-right"><div class="card-pricing"><span class="price-tag monthly">$50/mo</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="summary-panel">
+  <div class="summary-inner">
+    <div class="summary-prices">
+      <div><div class="summary-price-label">Setup</div><div class="summary-price-value setup"><span class="original" id="originalSetup" style="display:none"></span><span id="totalSetup">$0</span></div></div>
+      <div><div class="summary-price-label">Monthly</div><div class="summary-price-value monthly"><span id="totalMonthly">$0/mo</span></div></div>
+      <div class="summary-save" id="savingsBadge" style="display:none"><span id="savingsText"></span></div>
+    </div>
+    <div class="summary-right">
+      <div class="item-count" id="itemCount">No items selected</div>
+      <button class="checkout-btn" id="checkoutBtn" disabled onclick="handleCheckout()">Proceed to Checkout</button>
+    </div>
+  </div>
+</div>
+<script>
+var state={foundation:null,addons:new Set(),pageQty:0,appliedBundle:null};
+var pricing={basic:{setup:599,monthly:49},ai:{setup:799,monthly:89},bilingual:{setup:150,monthly:20},pages:{setup:100,monthly:0},blog:{setup:200,monthly:0},googleVis:{setup:250,monthly:35},gbpOnly:{setup:150,monthly:0},reviewBooster:{setup:100,monthly:20},booking:{setup:150,monthly:15},contactForm:{setup:75,monthly:0},email:{setup:50,monthly:10},content2:{setup:0,monthly:25},content5:{setup:0,monthly:50}};
+var bundles={starter:{name:'Starter - Get Online',foundation:'basic',requiredAddons:{pages:2,googleVis:true},setup:849,monthly:84,savings:200,desc:'Basic Website + 2 Additional Pages + Google Visibility Package'},growth:{name:'Growth - AI-Powered',foundation:'ai',requiredAddons:{pages:3,googleVis:true,reviewBooster:true},setup:1199,monthly:144,savings:250,desc:'AI-Powered Website + 3 Additional Pages + Google Visibility + Review Booster'},dominate:{name:'Dominate - Full Package',foundation:'ai',requiredAddons:{pages:5,googleVis:true,reviewBooster:true,booking:true,content5:true},setup:1599,monthly:209,savings:200,desc:'AI-Powered Website + 5 Pages + Google Visibility + Review Booster + Booking + Content Updates (5/mo)'}};
+var exclusions={content2:'content5',content5:'content2',googleVis:'gbpOnly',gbpOnly:'googleVis'};
+function selectFoundation(t){state.foundation=t;state.appliedBundle=null;document.getElementById('card-basic').classList.toggle('selected',t==='basic');document.getElementById('card-ai').classList.toggle('selected',t==='ai');clearBP();updateSteps();checkBM();recalc();}
+function toggleAddon(id){if(id==='pages'){if(!state.addons.has('pages')){state.addons.add('pages');state.pageQty=1}else{state.addons.delete('pages');state.pageQty=0}}else{if(state.addons.has(id))state.addons.delete(id);else{state.addons.add(id);if(exclusions[id]&&state.addons.has(exclusions[id])){state.addons.delete(exclusions[id]);document.getElementById('card-'+exclusions[id]).classList.remove('selected')}}}state.appliedBundle=null;document.getElementById('card-'+id).classList.toggle('selected',state.addons.has(id));document.getElementById('qty-pages').textContent=state.pageQty;clearBP();updateSteps();checkBM();recalc();}
+function adjustQty(id,d){if(id==='pages'){var n=state.pageQty+d;if(n<0)return;state.pageQty=n;if(n===0){state.addons.delete('pages');document.getElementById('card-pages').classList.remove('selected')}else{state.addons.add('pages');document.getElementById('card-pages').classList.add('selected')}document.getElementById('qty-pages').textContent=state.pageQty;state.appliedBundle=null;clearBP();checkBM();recalc();}}
+function applyBundle(k){var b=bundles[k];state.foundation=b.foundation;document.getElementById('card-basic').classList.toggle('selected',b.foundation==='basic');document.getElementById('card-ai').classList.toggle('selected',b.foundation==='ai');state.addons.clear();document.querySelectorAll('.card').forEach(function(c){if(c.id!=='card-basic'&&c.id!=='card-ai')c.classList.remove('selected')});var entries=Object.entries(b.requiredAddons);for(var i=0;i<entries.length;i++){var a=entries[i][0],v=entries[i][1];if(a==='pages'){state.addons.add('pages');state.pageQty=v;document.getElementById('card-pages').classList.add('selected');document.getElementById('qty-pages').textContent=v}else{state.addons.add(a);document.getElementById('card-'+a).classList.add('selected')}}state.appliedBundle=k;document.querySelectorAll('.bundle-pick').forEach(function(bp){bp.classList.remove('active')});document.getElementById('bp-'+k).classList.add('active');updateSteps();checkBM();recalc();}
+function clearBP(){document.querySelectorAll('.bundle-pick').forEach(function(bp){bp.classList.remove('active')});}
+function checkBM(){var banner=document.getElementById('bundleBanner');var m=null;var bkeys=Object.keys(bundles);for(var bi=0;bi<bkeys.length;bi++){var k=bkeys[bi],b=bundles[k];if(state.foundation!==b.foundation)continue;var ok=true;var ra=Object.entries(b.requiredAddons);for(var i=0;i<ra.length;i++){var a=ra[i][0],v=ra[i][1];if(a==='pages'){if(!state.addons.has('pages')||state.pageQty<v){ok=false;break}}else{if(!state.addons.has(a)){ok=false;break}}}if(ok){var bk=new Set(Object.keys(b.requiredAddons));state.addons.forEach(function(a){if(a==='bilingual')return;if(!bk.has(a))ok=false});if(ok&&state.addons.has('pages')&&state.pageQty>(b.requiredAddons.pages||0))ok=false}if(ok){m=k;break}}if(m){var b=bundles[m];var ac=calcALC();banner.classList.add('visible');document.getElementById('bundleName').textContent=b.name;document.getElementById('bundleSavings').innerHTML='<span class="strikethrough">$'+ac.setup+'</span> $'+b.setup+' setup - save $'+b.savings;document.getElementById('bundleDesc').textContent=b.desc;state.appliedBundle=m}else{banner.classList.remove('visible');state.appliedBundle=null}}
+function calcALC(){var s=0,m=0;if(state.foundation){s+=pricing[state.foundation].setup;m+=pricing[state.foundation].monthly}state.addons.forEach(function(a){if(a==='pages')s+=pricing.pages.setup*state.pageQty;else if(a==='bilingual')return;else{s+=pricing[a].setup;m+=pricing[a].monthly}});return{setup:s,monthly:m}}
+function recalc(){var setup=0,monthly=0;var ac=calcALC();if(state.appliedBundle){var b=bundles[state.appliedBundle];setup=b.setup;monthly=b.monthly}else{setup=ac.setup;monthly=ac.monthly}if(state.addons.has('bilingual')){setup+=pricing.bilingual.setup;monthly+=pricing.bilingual.monthly;ac.setup+=pricing.bilingual.setup;ac.monthly+=pricing.bilingual.monthly}document.getElementById('totalSetup').textContent='$'+setup.toLocaleString();document.getElementById('totalMonthly').textContent='$'+monthly+'/mo';var oS=document.getElementById('originalSetup');var badge=document.getElementById('savingsBadge');if(state.appliedBundle){var b=bundles[state.appliedBundle];var setupSavings=ac.setup-setup;if(setupSavings>0){oS.textContent='$'+ac.setup.toLocaleString();oS.style.display='inline';badge.style.display='inline-block';document.getElementById('savingsText').textContent='Save $'+setupSavings+' on setup'}else{oS.style.display='none';badge.style.display='none'}}else{oS.style.display='none';badge.style.display='none'}var c=0;if(state.foundation)c++;c+=state.addons.size;if(state.addons.has('pages')&&state.pageQty>1)c+=state.pageQty-1;document.getElementById('itemCount').textContent=c===0?'No items selected':c+' item'+(c>1?'s':'');document.getElementById('checkoutBtn').disabled=!state.foundation}
+function updateSteps(){var s1=document.getElementById('step1'),s2=document.getElementById('step2'),s3=document.getElementById('step3');if(state.foundation){s1.className='step-pill done';s2.className='step-pill active'}else{s1.className='step-pill active';s2.className='step-pill'}if(state.addons.size>0){s2.className='step-pill done';s3.className='step-pill active'}else{s3.className='step-pill'}}
+function handleCheckout(){var sel={foundation:state.foundation,addons:Array.from(state.addons),pageQty:state.pageQty,bundle:state.appliedBundle,bilingual:state.addons.has('bilingual')};var fs,fm;if(state.appliedBundle){var b=bundles[state.appliedBundle];fs=b.setup;fm=b.monthly}else{var ac=calcALC();fs=ac.setup;fm=ac.monthly}if(state.addons.has('bilingual')){fs+=pricing.bilingual.setup;fm+=pricing.bilingual.monthly}sel.totalSetup=fs;sel.totalMonthly=fm;console.log('Checkout payload:',JSON.stringify(sel,null,2));alert('Package configured!\n\nSetup: $'+fs.toLocaleString()+'\nMonthly: $'+fm+'/mo'+(state.appliedBundle?'\nBundle: '+bundles[state.appliedBundle].name:'')+'\n\n(In production, this sends to Zapier then Stripe Checkout)')}
+recalc();
+</script>
+</body>
+</html>
